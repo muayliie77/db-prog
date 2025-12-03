@@ -360,9 +360,49 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <article id="post-4195" class="post-4195 page type-page status-publish hentry">
 
 	<div class="entry-content">
-		<div class="kc_clfw"></div><section class="kc-elm kc-css-486934 kc_row"><div class="kc-row-container  kc-container"><div class="kc-wrap-columns"><div class="kc-elm kc-css-32845 kc_col-sm-12 kc_column kc_col-sm-12"><div class="kc-col-container"><div class="kc-elm kc-css-881895 kc_text_block"><p><script src="https://madbike.madbike.co/public/car-rental/integrations/assets/integrator"></script></p>
-<div class="hq-rental-software-integration" data-integrator_link="https://madbike.madbike.co/public/car-rental/integrations" data-brand="c282d62c-458d-4dc7-a28a-9031b606df5c" data-snippet="reservations" data-skip_language="" data-rate_type_uuid="" data-referral=""></div>
-</div></div></div></div></div></section>	</div><!-- .entry-content -->
+		<div class="kc_clfw"></div><section class="kc-elm kc-css-486934 kc_row"><div class="kc-row-container  kc-container"><div class="kc-wrap-columns"><div class="kc-elm kc-css-32845 kc_col-sm-12 kc_column kc_col-sm-12"><div class="kc-col-container">                                <div class="kc-elm kc-css-881895 kc_text_block">
+                                  <!-- Dynamic Bikes List -->
+                                  <div class="container" style="padding: 20px 0;">
+                                    {% with active_step=2 %}
+                                        {% include "myshop_template/step_nav.html" %}
+                                    {% endwith %}
+                                    <h2 style="text-align: center; margin-bottom: 30px;">Select a Bike</h2>
+                                    
+                                    <form action="{% url 'bikes' %}" method="post">
+                                        {% csrf_token %}
+                                        
+                                        {% if bikes %}
+                                            <div class="row">
+                                                {% for bike in bikes %}
+                                                <div class="col-md-4 col-sm-6">
+                                                    <div class="bike-card" style="border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                                                        <div class="bike-img" style="margin-bottom: 15px; height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                                            {% if bike.image_url %}
+                                                                <img src="{{ bike.image_url }}" alt="{{ bike.model_name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                                            {% else %}
+                                                                <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image" style="max-width: 100%; height: auto; border-radius: 5px;">
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="bike-info">
+                                                            <h3 style="font-size: 18px; font-weight: bold;">{{ bike.model_name }}</h3>
+                                                            <p style="color: #666;">Color: {{ bike.color }}</p>
+                                                            <p style="font-weight: bold; color: #E21C21;">฿{{ bike.category.price_daily }}/day</p>
+                                                            
+                                                            <button type="submit" name="bike_id" value="{{ bike.bike_id }}" class="btn btn-primary" style="background-color: #022162; border: none; width: 100%; margin-top: 10px;">Select This Bike</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-warning text-center">
+                                                No bikes available at the moment.
+                                            </div>
+                                        {% endif %}
+                                        
+                                    </form>
+                                  </div>
+                                </div></div></div></div></div></section>	</div><!-- .entry-content -->
 
 	</article><!-- #post-4195 -->
                         </div>
