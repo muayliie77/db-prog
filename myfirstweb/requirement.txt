@@ -1,3 +1,4 @@
 asgiref==3.11.0
 Django==5.2.9
 sqlparse==0.5.4
+mysqlclient==2.2.4

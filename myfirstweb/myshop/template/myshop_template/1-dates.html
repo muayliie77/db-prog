@@ -1268,10 +1268,7 @@
 					<nav class="navbar">
 						<div class="container">
 							<div class="navbar-header">
-								<a
-									href="https://madbike.co/"
-									class="custom-logo-link"
-									rel="home"
+								<a href="{% url 'home' %}" class="custom-logo-link" rel="home"
 									><img
 										width="150"
 										height="97"
@@ -1437,9 +1434,9 @@
 																			margin-bottom: 20px;
 																		"
 																	>
-                                                                        {% with active_step=1 %}
-                                                                            {% include "myshop_template/step_nav.html" %}
-                                                                        {% endwith %}
+																		{% with active_step=1 %}
+																			{% include "myshop_template/step_nav.html" %}
+																		{% endwith %}
 																		<h3
 																			style="
 																				margin-bottom: 20px;
@@ -1449,137 +1446,137 @@
 																		>
 																			Booking Details
 																		</h3>
-                                                                        <form
-                                                                            action="{% url 'dates' %}"
-                                                                            method="post"
-                                                                            class="auto-submit-form"
-                                                                        >
-                                                                            {% csrf_token %}
-                                                                            <div class="form-group">
-                                                                                <label
-                                                                                    for="email"
-                                                                                    style="font-weight: bold"
-                                                                                    >Email</label
-                                                                                >
-                                                                                <input
-                                                                                    type="email"
-                                                                                    class="form-control"
-                                                                                    id="email"
-                                                                                    name="email"
-                                                                                    placeholder="Enter your email"
-                                                                                    required
-                                                                                    value="{{ initial_data.email|default:'' }}"
-                                                                                    style="
-                                                                                        width: 100%;
-                                                                                        padding: 10px;
-                                                                                        margin-bottom: 15px;
-                                                                                        border: 1px solid #ccc;
-                                                                                        border-radius: 4px;
-                                                                                    "
-                                                                                />
-                                                                            </div>
+																		<form
+																			action="{% url 'dates' %}"
+																			method="post"
+																			class="auto-submit-form"
+																		>
+																			{% csrf_token %}
+																			<div class="form-group">
+																				<label
+																					for="email"
+																					style="font-weight: bold"
+																					>Email</label
+																				>
+																				<input
+																					type="email"
+																					class="form-control"
+																					id="email"
+																					name="email"
+																					placeholder="Enter your email"
+																					required
+																					value="{{ initial_data.email|default:'' }}"
+																					style="
+																						width: 100%;
+																						padding: 10px;
+																						margin-bottom: 15px;
+																						border: 1px solid #ccc;
+																						border-radius: 4px;
+																					"
+																				/>
+																			</div>
 
-                                                                            <div class="row">
-                                                                                <div class="col-md-6">
-                                                                                    <div class="form-group">
-                                                                                        <label
-                                                                                            for="pickup_date"
-                                                                                            style="font-weight: bold"
-                                                                                            >Pickup Date</label
-                                                                                        >
-                                                                                        <input
-                                                                                            type="date"
-                                                                                            class="form-control"
-                                                                                            id="pickup_date"
-                                                                                            name="pickup_date"
-                                                                                            required
-                                                                                            value="{{ initial_data.pickup_date|default:'' }}"
-                                                                                            style="
-                                                                                                width: 100%;
-                                                                                                padding: 10px;
-                                                                                                margin-bottom: 15px;
-                                                                                                border: 1px solid #ccc;
-                                                                                                border-radius: 4px;
-                                                                                            "
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <div class="form-group">
-                                                                                        <label
-                                                                                            for="pickup_time"
-                                                                                            style="font-weight: bold"
-                                                                                            >Pickup Time</label
-                                                                                        >
-                                                                                        <input
-                                                                                            type="time"
-                                                                                            class="form-control"
-                                                                                            id="pickup_time"
-                                                                                            name="pickup_time"
-                                                                                            required
-                                                                                            value="{{ initial_data.pickup_time|default:'' }}"
-                                                                                            style="
-                                                                                                width: 100%;
-                                                                                                padding: 10px;
-                                                                                                margin-bottom: 15px;
-                                                                                                border: 1px solid #ccc;
-                                                                                                border-radius: 4px;
-                                                                                            "
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
+																			<div class="row">
+																				<div class="col-md-6">
+																					<div class="form-group">
+																						<label
+																							for="pickup_date"
+																							style="font-weight: bold"
+																							>Pickup Date</label
+																						>
+																						<input
+																							type="date"
+																							class="form-control"
+																							id="pickup_date"
+																							name="pickup_date"
+																							required
+																							value="{{ initial_data.pickup_date|default:'' }}"
+																							style="
+																								width: 100%;
+																								padding: 10px;
+																								margin-bottom: 15px;
+																								border: 1px solid #ccc;
+																								border-radius: 4px;
+																							"
+																						/>
+																					</div>
+																				</div>
+																				<div class="col-md-6">
+																					<div class="form-group">
+																						<label
+																							for="pickup_time"
+																							style="font-weight: bold"
+																							>Pickup Time</label
+																						>
+																						<input
+																							type="time"
+																							class="form-control"
+																							id="pickup_time"
+																							name="pickup_time"
+																							required
+																							value="{{ initial_data.pickup_time|default:'' }}"
+																							style="
+																								width: 100%;
+																								padding: 10px;
+																								margin-bottom: 15px;
+																								border: 1px solid #ccc;
+																								border-radius: 4px;
+																							"
+																						/>
+																					</div>
+																				</div>
+																			</div>
 
-                                                                            <div class="row">
-                                                                                <div class="col-md-6">
-                                                                                    <div class="form-group">
-                                                                                        <label
-                                                                                            for="return_date"
-                                                                                            style="font-weight: bold"
-                                                                                            >Return Date</label
-                                                                                        >
-                                                                                        <input
-                                                                                            type="date"
-                                                                                            class="form-control"
-                                                                                            id="return_date"
-                                                                                            name="return_date"
-                                                                                            required
-                                                                                            value="{{ initial_data.return_date|default:'' }}"
-                                                                                            style="
-                                                                                                width: 100%;
-                                                                                                padding: 10px;
-                                                                                                margin-bottom: 15px;
-                                                                                                border: 1px solid #ccc;
-                                                                                                border-radius: 4px;
-                                                                                            "
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-md-6">
-                                                                                    <div class="form-group">
-                                                                                        <label
-                                                                                            for="return_time"
-                                                                                            style="font-weight: bold"
-                                                                                            >Return Time</label
-                                                                                        >
-                                                                                        <input
-                                                                                            type="time"
-                                                                                            class="form-control"
-                                                                                            id="return_time"
-                                                                                            name="return_time"
-                                                                                            required
-                                                                                            value="{{ initial_data.return_time|default:'' }}"
-                                                                                            style="
-                                                                                                width: 100%;
-                                                                                                padding: 10px;
-                                                                                                margin-bottom: 15px;
-                                                                                                border: 1px solid #ccc;
-                                                                                                border-radius: 4px;
-                                                                                            "
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
+																			<div class="row">
+																				<div class="col-md-6">
+																					<div class="form-group">
+																						<label
+																							for="return_date"
+																							style="font-weight: bold"
+																							>Return Date</label
+																						>
+																						<input
+																							type="date"
+																							class="form-control"
+																							id="return_date"
+																							name="return_date"
+																							required
+																							value="{{ initial_data.return_date|default:'' }}"
+																							style="
+																								width: 100%;
+																								padding: 10px;
+																								margin-bottom: 15px;
+																								border: 1px solid #ccc;
+																								border-radius: 4px;
+																							"
+																						/>
+																					</div>
+																				</div>
+																				<div class="col-md-6">
+																					<div class="form-group">
+																						<label
+																							for="return_time"
+																							style="font-weight: bold"
+																							>Return Time</label
+																						>
+																						<input
+																							type="time"
+																							class="form-control"
+																							id="return_time"
+																							name="return_time"
+																							required
+																							value="{{ initial_data.return_time|default:'' }}"
+																							style="
+																								width: 100%;
+																								padding: 10px;
+																								margin-bottom: 15px;
+																								border: 1px solid #ccc;
+																								border-radius: 4px;
+																							"
+																						/>
+																					</div>
+																				</div>
+																			</div>
 
 																			<div
 																				class="form-group"
@@ -1624,6 +1621,90 @@
 				<!-- #main -->
 			</div>
 			<!-- #primary -->
+
+			<!-- Session Controls -->
+			<div
+				style="
+					text-align: center;
+					margin-top: 50px;
+					padding: 20px 0;
+					border-top: 1px solid #eee;
+				"
+			>
+				<div
+					id="session-timer"
+					style="font-size: 11px; color: #999; margin-bottom: 8px"
+				></div>
+				<a
+					href="{% url 'clear_session' %}"
+					onclick="return confirm('Are you sure you want to clear your booking session? All entered data will be lost.');"
+					style="
+						background: #999;
+						color: #fff;
+						padding: 6px 15px;
+						border-radius: 4px;
+						text-decoration: none;
+						font-size: 12px;
+						display: inline-block;
+						transition: all 0.3s ease;
+						opacity: 0.7;
+					"
+				>
+					Clear Session
+				</a>
+			</div>
+
+			<script>
+				// Session timeout warning
+				(function () {
+					const SESSION_TIMEOUT = 600; // 10 minutes in seconds
+					let timeLeft = SESSION_TIMEOUT;
+					const timerElement = document.getElementById("session-timer");
+
+					if (!timerElement) return; // Exit if element doesn't exist
+
+					// Update timer every second
+					const timer = setInterval(function () {
+						timeLeft--;
+						const minutes = Math.floor(timeLeft / 60);
+						const seconds = timeLeft % 60;
+
+						if (timeLeft <= 60) {
+							// Less than 1 minute - show warning in red
+							timerElement.style.color = "#E21C21";
+							timerElement.style.fontWeight = "bold";
+							timerElement.textContent = `⚠️ Session expires in ${seconds} seconds!`;
+						} else if (timeLeft <= 300) {
+							// Less than 5 minutes - show warning in orange
+							timerElement.style.color = "#ff8800";
+							timerElement.textContent = `Session expires in ${minutes}m ${seconds}s`;
+						} else {
+							// More than 5 minutes - show normal
+							timerElement.style.color = "#999";
+							timerElement.textContent = `Session expires in ${minutes} minutes`;
+						}
+
+						if (timeLeft <= 0) {
+							clearInterval(timer);
+							timerElement.textContent = "Session expired!";
+							alert(
+								"Your session has expired. You will be redirected to start a new booking."
+							);
+							window.location.href = "{% url 'dates' %}";
+						}
+					}, 1000);
+
+					// Reset timer on any user activity
+					let resetTimer = function () {
+						timeLeft = SESSION_TIMEOUT;
+					};
+
+					document.addEventListener("mousedown", resetTimer);
+					document.addEventListener("keypress", resetTimer);
+					document.addEventListener("scroll", resetTimer);
+					document.addEventListener("touchstart", resetTimer);
+				})();
+			</script>
 
 			<script nitro-exclude>
 				var heartbeatData = new FormData();

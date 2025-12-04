@@ -4,59 +4,174 @@
 {% with active_step=3 %}
     {% include "myshop_template/step_nav.html" %}
 {% endwith %}
+
 <div class="content-section section-padding">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="entry-content">
-                    <div class="custom-booking-form-container" style="background: #fff; padding: 30px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 20px; max-width: 800px; margin: 0 auto;">
-                        <h3 style="margin-bottom: 20px; text-align: center; font-weight: bold;">Customer Information</h3>
-                        <form action="{% url 'customer' %}" method="post" class="auto-submit-form">
-                            {% csrf_token %}
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="first_name" style="font-weight: bold;">First Name</label>
-                                        <input type="text" class="form-control" id="first_name" name="first_name" required value="{{ initial_data.first_name|default:'' }}" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="last_name" style="font-weight: bold;">Last Name</label>
-                                        <input type="text" class="form-control" id="last_name" name="last_name" required value="{{ initial_data.last_name|default:'' }}" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
-                                    </div>
-                                </div>
-                            </div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="entry-content">
+					<div
+						class="custom-booking-form-container"
+						style="
+							background: #fff;
+							padding: 30px;
+							border: 1px solid #ddd;
+							border-radius: 5px;
+							margin-bottom: 20px;
+							max-width: 800px;
+							margin: 0 auto;
+						"
+					>
+						<h3
+							style="margin-bottom: 20px; text-align: center; font-weight: bold"
+						>
+							Customer Information
+						</h3>
+						<form
+							action="{% url 'customer' %}"
+							method="post"
+							class="auto-submit-form"
+						>
+							{% csrf_token %}
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="first_name" style="font-weight: bold"
+											>First Name</label
+										>
+										<input
+											type="text"
+											class="form-control"
+											id="first_name"
+											name="first_name"
+											required
+											value="{{ initial_data.first_name|default:'' }}"
+											style="
+												width: 100%;
+												padding: 10px;
+												margin-bottom: 15px;
+												border: 1px solid #ccc;
+												border-radius: 4px;
+											"
+										/>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="last_name" style="font-weight: bold"
+											>Last Name</label
+										>
+										<input
+											type="text"
+											class="form-control"
+											id="last_name"
+											name="last_name"
+											required
+											value="{{ initial_data.last_name|default:'' }}"
+											style="
+												width: 100%;
+												padding: 10px;
+												margin-bottom: 15px;
+												border: 1px solid #ccc;
+												border-radius: 4px;
+											"
+										/>
+									</div>
+								</div>
+							</div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="phone" style="font-weight: bold;">Phone Number</label>
-                                        <input type="tel" class="form-control" id="phone" name="phone" required value="{{ initial_data.phone|default:'' }}" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="line_id" style="font-weight: bold;">Line ID (Optional)</label>
-                                        <input type="text" class="form-control" id="line_id" name="line_id" value="{{ initial_data.line_id|default:'' }}" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
-                                    </div>
-                                </div>
-                            </div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="phone" style="font-weight: bold"
+											>Phone Number</label
+										>
+										<input
+											type="tel"
+											class="form-control"
+											id="phone"
+											name="phone"
+											required
+											value="{{ initial_data.phone|default:'' }}"
+											style="
+												width: 100%;
+												padding: 10px;
+												margin-bottom: 15px;
+												border: 1px solid #ccc;
+												border-radius: 4px;
+											"
+										/>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="line_id" style="font-weight: bold"
+											>Line ID (Optional)</label
+										>
+										<input
+											type="text"
+											class="form-control"
+											id="line_id"
+											name="line_id"
+											value="{{ initial_data.line_id|default:'' }}"
+											style="
+												width: 100%;
+												padding: 10px;
+												margin-bottom: 15px;
+												border: 1px solid #ccc;
+												border-radius: 4px;
+											"
+										/>
+									</div>
+								</div>
+							</div>
 
-                            <div class="form-group">
-                                <label for="passport_id" style="font-weight: bold;">Passport ID / ID Card Number</label>
-                                <input type="text" class="form-control" id="passport_id" name="passport_id" required value="{{ initial_data.passport_id|default:'' }}" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
-                            </div>
+							<div class="form-group">
+								<label for="citizen_id" style="font-weight: bold"
+									>Passport ID / ID Card Number</label
+								>
+								<input
+									type="text"
+									class="form-control"
+									id="citizen_id"
+									name="citizen_id"
+									required
+									value="{{ initial_data.citizen_id|default:'' }}"
+									style="
+										width: 100%;
+										padding: 10px;
+										margin-bottom: 15px;
+										border: 1px solid #ccc;
+										border-radius: 4px;
+									"
+								/>
+							</div>
 
-                            <div class="form-group" style="text-align: center; margin-top: 20px;">
-                                <button type="submit" class="btn btn-primary" style="background-color: #E21C21; border-color: #E21C21; padding: 10px 30px; font-size: 16px; color: white; border-radius: 5px; cursor: pointer;">Continue to Checkout</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+							<div
+								class="form-group"
+								style="text-align: center; margin-top: 20px"
+							>
+								<button
+									type="submit"
+									class="btn btn-primary"
+									style="
+										background-color: #e21c21;
+										border-color: #e21c21;
+										padding: 10px 30px;
+										font-size: 16px;
+										color: white;
+										border-radius: 5px;
+										cursor: pointer;
+									"
+								>
+									Continue to Checkout
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-{% endblock %}
-
+{% include "myshop_template/session_controls.html" %} {% endblock %}

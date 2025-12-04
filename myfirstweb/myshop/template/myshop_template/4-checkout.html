@@ -5,44 +5,289 @@
     {% include "myshop_template/step_nav.html" %}
 {% endwith %}
 <div class="content-section section-padding">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="entry-content">
-                    <div class="custom-booking-form-container" style="background: #fff; padding: 30px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 20px; max-width: 800px; margin: 0 auto;">
-                        <h2 style="margin-bottom: 30px; text-align: center; font-weight: bold; color: #022162;">Booking Summary</h2>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h4 style="border-bottom: 2px solid #E21C21; padding-bottom: 10px; margin-bottom: 15px;">Rental Details</h4>
-                                <p><strong>Pickup:</strong> {{ rental.pickup_date }} at {{ rental.pickup_time }}</p>
-                                <p><strong>Return:</strong> {{ rental.return_date }} at {{ rental.return_time }}</p>
-                                <p><strong>Selected Bike:</strong> {{ bike.model_name }} ({{ bike.color }})</p>
-                                <p><strong>Price:</strong> ฿{{ bike.category.price_daily }} / day</p>
-                            </div>
-                            <div class="col-md-6">
-                                <h4 style="border-bottom: 2px solid #E21C21; padding-bottom: 10px; margin-bottom: 15px;">Customer Details</h4>
-                                <p><strong>Name:</strong> {{ customer.first_name }} {{ customer.last_name }}</p>
-                                <p><strong>Email:</strong> {{ rental.email }}</p>
-                                <p><strong>Phone:</strong> {{ customer.phone }}</p>
-                                <p><strong>Line ID:</strong> {{ customer.line_id }}</p>
-                            </div>
-                        </div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="entry-content">
+					<div
+						class="custom-booking-form-container"
+						style="
+							background: #fff;
+							padding: 30px;
+							border: 1px solid #ddd;
+							border-radius: 5px;
+							margin-bottom: 20px;
+							max-width: 800px;
+							margin: 0 auto;
+						"
+					>
+						<h2
+							style="
+								margin-bottom: 30px;
+								text-align: center;
+								font-weight: bold;
+								color: #022162;
+							"
+						>
+							Booking Summary
+						</h2>
 
-                        <hr style="margin: 30px 0;">
+						<div class="row">
+							<div class="col-md-6">
+								<h4
+									style="
+										border-bottom: 2px solid #e21c21;
+										padding-bottom: 10px;
+										margin-bottom: 15px;
+									"
+								>
+									Rental Details
+								</h4>
+								<p>
+									<strong>Pickup:</strong> {{ rental.pickup_date }} at {{ rental.pickup_time }}
+								</p>
+								<p>
+									<strong>Return:</strong> {{ rental.return_date }} at {{ rental.return_time }}
+								</p>
+								<p>
+									<strong>Selected Bike:</strong> {{ bike.model_name }}{% if bike.engine_size %} ({{ bike.engine_size }}cc){% endif %}
+								</p>
+								<p>
+									<strong>Rental Period:</strong> {{ rental_days }} day{{ rental_days|pluralize }}
+								</p>
+								<p>
+									<strong>Daily Rate:</strong> ฿{{ bike.category.price_daily }}
+									/ day
+								</p>
+							</div>
+							<div class="col-md-6">
+								<h4
+									style="
+										border-bottom: 2px solid #e21c21;
+										padding-bottom: 10px;
+										margin-bottom: 15px;
+									"
+								>
+									Customer Details
+								</h4>
+								<p>
+									<strong>Name:</strong> {{ customer.first_name }} {{ customer.last_name }}
+								</p>
+								<p><strong>Email:</strong> {{ rental.email }}</p>
+								<p><strong>Phone:</strong> {{ customer.phone }}</p>
+								<p>
+									<strong>Line ID:</strong> {{ customer.line_id|default:"N/A" }}
+								</p>
+							</div>
+						</div>
 
-                        <form action="{% url 'checkout' %}" method="post" style="text-align: center;">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <p style="margin-bottom: 20px; font-size: 14px; color: #666;">By clicking "Confirm Booking", you agree to our Terms & Conditions.</p>
-                                <button type="submit" class="btn btn-primary" style="background-color: #E21C21; border-color: #E21C21; padding: 15px 40px; font-size: 18px; color: white; border-radius: 5px; cursor: pointer; font-weight: bold;">Confirm Booking</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+						<hr style="margin: 30px 0" />
+
+						<!-- Price Breakdown -->
+						<div
+							style="
+								background: #f9f9f9;
+								padding: 20px;
+								border-radius: 5px;
+								margin-bottom: 30px;
+							"
+						>
+							<h4
+								style="
+									border-bottom: 2px solid #e21c21;
+									padding-bottom: 10px;
+									margin-bottom: 15px;
+									color: #022162;
+								"
+							>
+								Price Breakdown
+							</h4>
+							<div
+								style="
+									display: flex;
+									justify-content: space-between;
+									margin-bottom: 10px;
+								"
+							>
+								<span
+									><strong
+										>Rental Price ({{ rental_days }} day{{ rental_days|pluralize }}):</strong
+									></span
+								>
+								<span>฿{{ rental_price|floatformat:2 }}</span>
+							</div>
+							<div
+								style="
+									display: flex;
+									justify-content: space-between;
+									margin-bottom: 10px;
+								"
+							>
+								<span><strong>Deposit Amount:</strong></span>
+								<span>฿{{ deposit_amount|floatformat:2 }}</span>
+							</div>
+							<hr style="margin: 15px 0; border-top: 2px solid #e21c21" />
+							<div
+								style="
+									display: flex;
+									justify-content: space-between;
+									font-size: 20px;
+									font-weight: bold;
+									color: #022162;
+								"
+							>
+								<span><strong>Total Price:</strong></span>
+								<span style="color: #e21c21"
+									>฿{{ total_price|floatformat:2 }}</span
+								>
+							</div>
+						</div>
+
+						<form
+							action="{% url 'checkout' %}"
+							method="post"
+							style="text-align: center"
+						>
+							{% csrf_token %}
+							<div class="form-group">
+								<p style="margin-bottom: 20px; font-size: 14px; color: #666">
+									By clicking "Confirm Booking", you agree to our Terms &
+									Conditions.
+								</p>
+								<button
+									type="submit"
+									class="btn btn-primary"
+									style="
+										background-color: #e21c21;
+										border-color: #e21c21;
+										padding: 15px 40px;
+										font-size: 18px;
+										color: white;
+										border-radius: 5px;
+										cursor: pointer;
+										font-weight: bold;
+									"
+								>
+									Confirm Booking
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-{% endblock %}
 
+<!-- Success Modal -->
+<div
+	class="modal fade"
+	id="bookingSuccessModal"
+	tabindex="-1"
+	role="dialog"
+	aria-labelledby="bookingSuccessModalLabel"
+	aria-hidden="true"
+>
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header" style="border-bottom: none; padding-bottom: 0">
+				<button
+					type="button"
+					class="close"
+					data-dismiss="modal"
+					aria-label="Close"
+				>
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-center" style="padding: 20px 30px 40px">
+				<div style="font-size: 50px; color: #28a745; margin-bottom: 20px">
+					<i class="fa fa-check-circle"></i>
+				</div>
+				<h4
+					class="modal-title"
+					id="bookingSuccessModalLabel"
+					style="margin-bottom: 15px; font-weight: bold; color: #022162"
+				>
+					Success
+				</h4>
+				<p style="font-size: 18px; color: #333">
+					Booking Confirmed, Thank you!
+				</p>
+				<button
+					type="button"
+					class="btn btn-primary"
+					id="redirectHomeBtn"
+					style="
+						background-color: #e21c21;
+						border-color: #e21c21;
+						padding: 10px 30px;
+						margin-top: 20px;
+					"
+				>
+					Return to Home
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const form = document.querySelector("form");
+
+		if (form) {
+			form.addEventListener("submit", function (e) {
+				e.preventDefault();
+
+				// Show loading state if desired
+				const submitBtn = form.querySelector('button[type="submit"]');
+				const originalText = submitBtn.innerText;
+				submitBtn.innerText = "Processing...";
+				submitBtn.disabled = true;
+
+				const formData = new FormData(this);
+
+				fetch(this.action, {
+					method: "POST",
+					body: formData,
+					headers: {
+						"X-Requested-With": "XMLHttpRequest",
+					},
+				})
+					.then((response) => response.json())
+					.then((data) => {
+						if (data.success) {
+							// Show Bootstrap Modal
+							jQuery("#bookingSuccessModal").modal("show");
+
+							// Handle redirection
+							document
+								.getElementById("redirectHomeBtn")
+								.addEventListener("click", function () {
+									window.location.href = "{% url 'home' %}";
+								});
+
+							// Also redirect on modal close
+							jQuery("#bookingSuccessModal").on("hidden.bs.modal", function () {
+								window.location.href = "{% url 'home' %}";
+							});
+						} else {
+							alert("Something went wrong. Please try again.");
+							submitBtn.innerText = originalText;
+							submitBtn.disabled = false;
+						}
+					})
+					.catch((error) => {
+						console.error("Error:", error);
+						alert("An error occurred. Please try again.");
+						submitBtn.innerText = originalText;
+						submitBtn.disabled = false;
+					});
+			});
+		}
+	});
+</script>
+
+{% include "myshop_template/session_controls.html" %}
+{% endblock %}

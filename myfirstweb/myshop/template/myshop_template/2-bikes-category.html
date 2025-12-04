@@ -1,0 +1,74 @@
+{% extends "myshop_template/base.html" %}
+
+{% block content %}
+<div class="content-section section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="entry-content">
+                    <!-- Step Navigation -->
+                    {% with active_step=2 %}
+                        {% include "myshop_template/step_nav.html" %}
+                    {% endwith %}
+                    
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <a href="{% url 'bikes' %}?clear_category=1" style="color: #E21C21; text-decoration: none; font-size: 16px;">← Back to Categories</a>
+                        <h2 style="color: #022162; font-weight: bold; margin-top: 20px;">{{ category }} Bikes</h2>
+                    </div>
+                    
+                    <form action="{% url 'bikes' %}" method="post">
+                        {% csrf_token %}
+                        
+                        {% if bikes %}
+                            <div class="row">
+                                {% for bike in bikes %}
+                                <div class="col-md-4 col-sm-6" style="margin-bottom: 30px;">
+                                    <div class="bike-card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                                        <div class="bike-img" style="margin-bottom: 15px; height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                            {% if bike.image_url %}
+                                                <img src="{{ bike.image_url }}" alt="{{ bike.model_name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                            {% else %}
+                                                <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image" style="max-width: 100%; height: auto; border-radius: 5px;">
+                                            {% endif %}
+                                        </div>
+                                        <div class="bike-info">
+                                            <h3 style="font-size: 20px; font-weight: bold; color: #022162; margin-bottom: 10px;">{{ bike.model_name }}</h3>
+                                            {% if bike.engine_size %}
+                                            <p style="color: #666; margin-bottom: 5px;">Engine: {{ bike.engine_size }}cc</p>
+                                            {% endif %}
+                                            <p style="font-weight: bold; color: #E21C21; font-size: 18px; margin-bottom: 15px;">฿{{ bike.category.price_daily }}/day</p>
+                                            
+                                            <button type="submit" name="bike_id" value="{{ bike.bike_id }}" class="btn btn-primary" style="background-color: #022162; border: none; width: 100%; padding: 12px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: all 0.3s ease;">
+                                                Select This Bike
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning text-center" style="padding: 30px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px;">
+                                <p style="font-size: 18px; color: #856404;">No bikes available in {{ category }} category at the moment.</p>
+                                <a href="{% url 'bikes' %}?clear_category=1" style="color: #E21C21; text-decoration: none; font-weight: bold;">← Back to Categories</a>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bike-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
+    }
+    
+    .btn-primary:hover {
+        background-color: #E21C21 !important;
+    }
+</style>
+{% include "myshop_template/session_controls.html" %}
+{% endblock %}
+
