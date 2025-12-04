@@ -43,7 +43,25 @@ def Bikes(request):
     # In a real app, filter by availability for the specific dates
     bikes = Bike.objects.filter(status="Available")
 
-    return render(request, "myshop_template/2-bikes.html", {"bikes": bikes})
+    categorized_bikes = {
+        "Economy": [],
+        "Standard": [],
+        "Premium": [],
+    }
+
+    for bike in bikes:
+        name = bike.model_name
+        if any(m in name for m in ["Honda Click 125i", "Yamaha Grand Filano"]):
+            categorized_bikes["Standard"].append(bike)
+        elif any(m in name for m in ["Yamaha Aerox 155 ABS", "Yamaha NMAX 155 ABS"]):
+            categorized_bikes["Premium"].append(bike)
+        elif any(m in name for m in ["Yamaha Filano", "Honda Scoopy-i"]):
+            categorized_bikes["Economy"].append(bike)
+        else:
+            # Fallback for other bikes
+            categorized_bikes["Economy"].append(bike)
+
+    return render(request, "myshop_template/2-bikes.html", {"categorized_bikes": categorized_bikes})
 
 
 def CustomerView(request):
