@@ -36,6 +36,20 @@ class BikeCategory(models.Model):
         return self.name
 
 
+class PriceLog(models.Model):
+    log_id = models.AutoField(primary_key=True)
+    category = models.ForeignKey(BikeCategory, on_delete=models.CASCADE, db_column='category_id')
+    old_price = models.DecimalField(max_digits=10, decimal_places=2)
+    new_price = models.DecimalField(max_digits=10, decimal_places=2)
+    change_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'price_logs'
+
+    def __str__(self):
+        return f"Log {self.log_id} - {self.category}"
+
+
 class Bike(models.Model):
     STATUS_CHOICES = [
         ("Available", "Available"),

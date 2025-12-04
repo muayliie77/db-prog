@@ -1,12 +1,4 @@
-# from django.contrib import admin
-# from django.urls import path, include
-
-# urlpatterns = [
-# path( 'admin/', admin.site.urls),
-# path('', include('myshop.urls'))
-# ]
-
-from django.urls import path
+from django.urls import path, include
 from .views import Home, Dates, Bikes, CustomerView, Checkout, clear_session
 
 urlpatterns = [
@@ -16,4 +8,5 @@ urlpatterns = [
     path("customer/", CustomerView, name="customer"),
     path("checkout/", Checkout, name="checkout"),
     path("clear-session/", clear_session, name="clear_session"),
+    path("shop-admin/", include("myshop.admin_urls")),
 ]
