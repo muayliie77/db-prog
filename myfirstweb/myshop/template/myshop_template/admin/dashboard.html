@@ -1,0 +1,43 @@
+{% extends 'myshop_template/admin/base_admin.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Vehicles</h5>
+                <p class="card-text display-4">{{ total_bikes }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Available Vehicles</h5>
+                <p class="card-text display-4">{{ available_bikes }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Active Bookings</h5>
+                <p class="card-text display-4">{{ active_rentals }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h4>Quick Actions</h4>
+    <div class="d-grid gap-2 d-md-block">
+        <a href="{% url 'admin_create_model' %}" class="btn btn-outline-primary btn-lg">Create New Model</a>
+        <a href="{% url 'admin_add_inventory' %}" class="btn btn-outline-success btn-lg">Add Inventory</a>
+    </div>
+</div>
+{% endblock %}
+

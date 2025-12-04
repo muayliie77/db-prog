@@ -1,0 +1,68 @@
+{% extends 'myshop_template/admin/base_admin.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ title }}</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label for="model_name" class="form-label">Model Name</label>
+                <input type="text" class="form-control" id="model_name" name="model_name" value="{{ bike.model_name }}" required>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="license_plate" class="form-label">License Plate</label>
+                    <input type="text" class="form-control" id="license_plate" name="license_plate" value="{{ bike.license_plate }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="category_id" class="form-label">Category</label>
+                    <select class="form-select" id="category_id" name="category_id" required>
+                        <option value="">Choose...</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.category_id }}" {% if bike.category_id == cat.category_id %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="engine_size" class="form-label">Engine Size</label>
+                    <input type="text" class="form-control" id="engine_size" name="engine_size" value="{{ bike.engine_size }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="Available" {% if bike.status == 'Available' %}selected{% endif %}>Available</option>
+                        <option value="Rented" {% if bike.status == 'Rented' %}selected{% endif %}>Rented</option>
+                        <option value="Fix" {% if bike.status == 'Fix' %}selected{% endif %}>Fix</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3 mt-3">
+                <label for="image_url" class="form-label">Image URL</label>
+                <input type="text" class="form-control" id="image_url" name="image_url" value="{{ bike.image_url }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3">{{ bike.description }}</textarea>
+            </div>
+
+            <button class="btn btn-primary btn-lg" type="submit">Save Vehicle</button>
+            <a href="{% url 'admin_vehicles' %}" class="btn btn-secondary btn-lg">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,41 @@
+{% extends 'myshop_template/admin/base_admin.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Add Inventory</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="alert alert-info">
+            Select an existing vehicle model to copy its details (Model Name, Engine Size, Image, Description). You only need to provide the new License Plate.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label for="source_bike_id" class="form-label">Select Model to Copy</label>
+                <select class="form-select" id="source_bike_id" name="source_bike_id" required>
+                    <option value="">Choose a model...</option>
+                    {% for b in bikes %}
+                    <option value="{{ b.bike_id }}">{{ b.model_name }} ({{ b.category.name }}) - Template: {{ b.license_plate }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="license_plate" class="form-label">New License Plate</label>
+                <input type="text" class="form-control" id="license_plate" name="license_plate" placeholder="e.g. 1XX-9999" required>
+            </div>
+
+            <button class="btn btn-success btn-lg" type="submit">Add to Inventory</button>
+            <a href="{% url 'admin_vehicles' %}" class="btn btn-secondary btn-lg">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
