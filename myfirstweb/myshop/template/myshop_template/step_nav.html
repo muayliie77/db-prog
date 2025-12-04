@@ -1,0 +1,218 @@
+<style>
+    .step-nav-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px 0;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+    .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 15px;
+        position: relative;
+        width: 80px;
+    }
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid #E21C21;
+        color: #E21C21;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+    .step-label {
+        color: #E21C21;
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    /* Active State */
+    .step-item.active .step-circle {
+        background: #E21C21;
+        color: #fff;
+    }
+    
+    /* Inactive State (Disabled) */
+    .step-item.inactive .step-circle {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: #ccc;
+        color: #ccc;
+    }
+    .step-item.inactive .step-label {
+        opacity: 0.5;
+        color: #ccc;
+    }
+
+    /* Completed/Clickable State */
+    .step-item.clickable {
+        cursor: pointer;
+    }
+    .step-item.clickable .step-circle {
+        background: #fff;
+        color: #E21C21;
+        border-color: #E21C21;
+        opacity: 1;
+    }
+    /* If active is also clickable, keep active style */
+    .step-item.active.clickable .step-circle {
+        background: #E21C21;
+        color: #fff;
+    }
+
+    .step-item.clickable:hover .step-circle {
+        opacity: 1;
+        transform: scale(1.05);
+        background-color: #ffe6e6;
+    }
+    .step-item.active.clickable:hover .step-circle {
+        background-color: #E21C21;
+    }
+    
+    /* Links */
+    a.step-link {
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    
+    /* Disable pointer events on inactive steps wrapper */
+    .step-item.inactive a.step-link {
+        pointer-events: none;
+    }
+</style>
+
+<div class="step-nav-container">
+    <!-- Step 1: Dates (Always accessible) -->
+    <div class="step-item {% if active_step == 1 %}active{% endif %} clickable">
+        <a href="{% url 'dates' %}" class="step-link nav-submit-trigger" data-target="{% url 'dates' %}">
+            <div class="step-circle">1</div>
+            <div class="step-label">Dates</div>
+        </a>
+    </div>
+
+    <!-- Step 2: Bikes (Accessible if Dates filled) -->
+    {% with step2_enabled=request.session.rental_data %}
+    <div class="step-item {% if active_step == 2 %}active{% endif %} {% if step2_enabled %}clickable{% else %}inactive{% endif %}">
+        <a href="{% if step2_enabled %}{% url 'bikes' %}{% else %}#{% endif %}" class="step-link nav-submit-trigger" data-target="{% url 'bikes' %}">
+            <div class="step-circle">2</div>
+            <div class="step-label">Bikes</div>
+        </a>
+    </div>
+    {% endwith %}
+
+    <!-- Step 3: Customer (Accessible if Bike selected) -->
+    {% with step3_enabled=request.session.selected_bike_id %}
+    <div class="step-item {% if active_step == 3 %}active{% endif %} {% if step3_enabled %}clickable{% else %}inactive{% endif %}">
+        <a href="{% if step3_enabled %}{% url 'customer' %}{% else %}#{% endif %}" class="step-link nav-submit-trigger" data-target="{% url 'customer' %}">
+            <div class="step-circle">3</div>
+            <div class="step-label">Customer</div>
+        </a>
+    </div>
+    {% endwith %}
+
+    <!-- Step 4: Confirm (Accessible if Customer info filled) -->
+    {% with step4_enabled=request.session.customer_data %}
+    <div class="step-item {% if active_step == 4 %}active{% endif %} {% if step4_enabled %}clickable{% else %}inactive{% endif %}">
+        <a href="{% if step4_enabled %}{% url 'checkout' %}{% else %}#{% endif %}" class="step-link nav-submit-trigger" data-target="{% url 'checkout' %}">
+            <div class="step-circle">4</div>
+            <div class="step-label">Confirm</div>
+        </a>
+    </div>
+    {% endwith %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const triggers = document.querySelectorAll('.nav-submit-trigger');
+        const autoSubmitForm = document.querySelector('form.auto-submit-form');
+
+        triggers.forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                // If the link is disabled/inactive, do nothing
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    return;
+                }
+
+                // If we are on a page with an auto-submit form (Dates or Customer),
+                // we hijack the click to submit the form instead of following the link.
+                // This saves the current page's data before navigating.
+                if (autoSubmitForm) {
+                    e.preventDefault();
+                    const targetUrl = this.getAttribute('data-target');
+                    
+                    // Check if the form is valid
+                    if (autoSubmitForm.checkValidity()) {
+                        // Update form action to the target URL (Wait, no)
+                        // We can't just change action, because the views expect specific POSTs.
+                        // Actually, Dates view saves data then redirects to 'bikes'.
+                        // If we want to jump to 'customer' (Step 3) from Dates (Step 1),
+                        // we need to:
+                        // 1. Save Dates (POST to 'dates')
+                        // 2. Then redirect to 'customer'.
+                        
+                        // Standard form submission always redirects based on the View's logic.
+                        // The Dates view currently redirects to 'bikes'.
+                        // If we want to jump to 3, we can't easily change the view logic via frontend.
+                        
+                        // ALTERNATIVE: Rely on standard navigation.
+                        // If user edits data, they should click "Next" to save.
+                        // If they click a nav bubble, they are navigating AWAY.
+                        // Standard web behavior: unsaved changes are lost.
+                        // BUT TC-06 says: "Edit info on Page 1 -> Click 3 Customer bubble".
+                        // Implies "Save and Jump".
+                        
+                        // To achieve "Save and Jump":
+                        // We could use AJAX to submit the form data to the current URL (to save),
+                        // and on success, navigate to the target URL.
+                        
+                        const formData = new FormData(autoSubmitForm);
+                        const currentAction = autoSubmitForm.getAttribute('action');
+                        
+                        // Send data to current page's handler (which saves to session)
+                        fetch(currentAction, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                // Navigate to the clicked link
+                                window.location.href = targetUrl;
+                            } else {
+                                // If server rejects (validation), show error?
+                                // For now, just submit normally to see errors?
+                                // If we submit normally, we go to 'bikes' (Step 2).
+                                // That breaks the "Jump to 3" requirement.
+                                autoSubmitForm.reportValidity();
+                            }
+                        }).catch(error => {
+                            console.error('Error saving step:', error);
+                            // Fallback: just go there (changes lost)
+                            window.location.href = targetUrl;
+                        });
+                        
+                    } else {
+                        // Trigger browser validation UI
+                        autoSubmitForm.reportValidity();
+                    }
+                }
+                // If no form to auto-submit (e.g. Bikes page), just follow the link (default behavior)
+            });
+        });
+    });
+</script>

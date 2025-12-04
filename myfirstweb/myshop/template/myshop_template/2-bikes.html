@@ -1,0 +1,103 @@
+{% extends "myshop_template/base.html" %}
+
+{% block content %}
+<!-- Dynamic Bikes List -->
+<div class="container" style="padding: 20px 0;">
+{% with active_step=2 %}
+    {% include "myshop_template/step_nav.html" %}
+{% endwith %}
+<h2 style="text-align: center; margin-bottom: 30px;">Select a Bike</h2>
+
+<form action="{% url 'bikes' %}" method="post">
+    {% csrf_token %}
+    
+    <div class="row">
+        <!-- Economy Category -->
+        <div class="col-md-4">
+            <div class="category-section" style="background: #f9f9f9; border-radius: 5px; padding: 15px; height: 100%;">
+                <h3 style="text-align: center; color: #333; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; font-weight: bold;">Economy</h3>
+                {% if categorized_bikes.Economy %}
+                    {% for bike in categorized_bikes.Economy %}
+                        <div class="bike-card" style="border: 1px solid #ddd; background: #fff; border-radius: 5px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                            <div class="bike-img" style="margin-bottom: 15px; height: 150px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                {% if bike.image_url %}
+                                    <img src="{{ bike.image_url }}" alt="{{ bike.model_name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image" style="max-width: 100%; height: auto; border-radius: 5px;">
+                                {% endif %}
+                            </div>
+                            <div class="bike-info">
+                                <h4 style="font-size: 16px; font-weight: bold;">{{ bike.model_name }}</h4>
+                                <p style="color: #666; margin-bottom: 5px;">Color: {{ bike.color }}</p>
+                                <p style="font-weight: bold; color: #E21C21; margin-bottom: 10px;">฿{{ bike.category.price_daily }}/day</p>
+                                <button type="submit" name="bike_id" value="{{ bike.bike_id }}" class="btn btn-primary" style="background-color: #022162; border: none; width: 100%; padding: 8px;">Select</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center">No bikes available.</p>
+                {% endif %}
+                </div>
+    </div>
+    
+        <!-- Standard Category -->
+        <div class="col-md-4">
+            <div class="category-section" style="background: #f9f9f9; border-radius: 5px; padding: 15px; height: 100%;">
+                <h3 style="text-align: center; color: #333; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; font-weight: bold;">Standard</h3>
+                {% if categorized_bikes.Standard %}
+                    {% for bike in categorized_bikes.Standard %}
+                        <div class="bike-card" style="border: 1px solid #ddd; background: #fff; border-radius: 5px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                            <div class="bike-img" style="margin-bottom: 15px; height: 150px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                {% if bike.image_url %}
+                                    <img src="{{ bike.image_url }}" alt="{{ bike.model_name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image" style="max-width: 100%; height: auto; border-radius: 5px;">
+                                {% endif %}
+                            </div>
+                            <div class="bike-info">
+                                <h4 style="font-size: 16px; font-weight: bold;">{{ bike.model_name }}</h4>
+                                <p style="color: #666; margin-bottom: 5px;">Color: {{ bike.color }}</p>
+                                <p style="font-weight: bold; color: #E21C21; margin-bottom: 10px;">฿{{ bike.category.price_daily }}/day</p>
+                                <button type="submit" name="bike_id" value="{{ bike.bike_id }}" class="btn btn-primary" style="background-color: #022162; border: none; width: 100%; padding: 8px;">Select</button>
+                </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center">No bikes available.</p>
+                {% endif %}
+            </div>
+    </div>
+
+        <!-- Premium Category -->
+        <div class="col-md-4">
+            <div class="category-section" style="background: #f9f9f9; border-radius: 5px; padding: 15px; height: 100%;">
+                <h3 style="text-align: center; color: #333; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; font-weight: bold;">Premium</h3>
+                {% if categorized_bikes.Premium %}
+                    {% for bike in categorized_bikes.Premium %}
+                        <div class="bike-card" style="border: 1px solid #ddd; background: #fff; border-radius: 5px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                            <div class="bike-img" style="margin-bottom: 15px; height: 150px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                {% if bike.image_url %}
+                                    <img src="{{ bike.image_url }}" alt="{{ bike.model_name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image" style="max-width: 100%; height: auto; border-radius: 5px;">
+                                {% endif %}
+											</div>
+                            <div class="bike-info">
+                                <h4 style="font-size: 16px; font-weight: bold;">{{ bike.model_name }}</h4>
+                                <p style="color: #666; margin-bottom: 5px;">Color: {{ bike.color }}</p>
+                                <p style="font-weight: bold; color: #E21C21; margin-bottom: 10px;">฿{{ bike.category.price_daily }}/day</p>
+                                <button type="submit" name="bike_id" value="{{ bike.bike_id }}" class="btn btn-primary" style="background-color: #022162; border: none; width: 100%; padding: 8px;">Select</button>
+				</div>
+				</div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center">No bikes available.</p>
+                {% endif %}
+			</div>
+		</div>
+	</div>
+
+</form>
+</div>
+</div>
+{% endblock %}
