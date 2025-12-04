@@ -76,7 +76,32 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('table').DataTable();
+            $('table').each(function() {
+                var table = $(this);
+                // Count columns from thead
+                var columnCount = table.find('thead th').length;
+                
+                // Remove empty rows with colspan before initializing DataTables
+                table.find('tbody tr').each(function() {
+                    var row = $(this);
+                    var cells = row.find('td');
+                    // If row has only one cell with colspan, remove it
+                    if (cells.length === 1 && cells.attr('colspan')) {
+                        row.remove();
+                    }
+                });
+                
+                // Initialize DataTables with explicit column count
+                table.DataTable({
+                    columnDefs: [
+                        { targets: '_all', orderable: true }
+                    ],
+                    order: [],
+                    language: {
+                        emptyTable: "No data available in table"
+                    }
+                });
+            });
         });
     </script>
     {% block scripts %}{% endblock %}
