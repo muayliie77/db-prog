@@ -17,6 +17,7 @@
                 <th>Return (Actual)</th>
                 <th>Status</th>
                 <th>Total Price</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -44,14 +45,23 @@
                     {% endif %}
                 </td>
                 <td>{{ rental.total_price }}</td>
+                <td>
+                    {% if rental.payment_status == 'Active' and not rental.actual_return_date %}
+                        <form action="{% url 'admin_complete_booking' rental.rental_id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Confirm return of vehicle?');">
+                                <i class="fas fa-check"></i> Return
+                            </button>
+                        </form>
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="8" class="text-center">No bookings found.</td>
+                <td colspan="9" class="text-center">No bookings found.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endblock %}
-

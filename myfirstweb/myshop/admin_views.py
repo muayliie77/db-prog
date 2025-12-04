@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from .models import Admin, Customer, Rental, Bike, BikeCategory, PriceLog
 from functools import wraps
 from django.utils import timezone
+from django.db import connection
 
 # --- Authentication ---
 
@@ -66,6 +67,29 @@ def BookingList(request):
     return render(request, 'myshop_template/admin/booking_list.html', {'rentals': rentals})
 
 @admin_required
+def CompleteBooking(request, rental_id):
+    if request.method == 'POST':
+        try:
+            # Use Stored Procedure: AdminReturnBike
+            # AdminReturnBike(p_rental_id)
+            # This sets actual_return_date to NOW() and payment_status to 'Done'
+            # Trigger trg_bike_returned will set bike status to 'Available'
+            
+            with connection.cursor() as cursor:
+                cursor.execute("CALL AdminReturnBike(%s)", [rental_id])
+                
+            # Return success (if called via AJAX) or redirect
+            # Assuming this is called via form submission or AJAX
+            # Let's support redirection for now as it's simpler
+            return redirect('admin_bookings')
+        except Exception as e:
+            # Ideally show error message
+            print(f"Error completing booking: {e}")
+            return redirect('admin_bookings')
+    
+    return redirect('admin_bookings')
+
+@admin_required
 def VehicleList(request):
     bikes = Bike.objects.all().order_by('category', 'model_name')
     return render(request, 'myshop_template/admin/vehicle_list.html', {'bikes': bikes})
@@ -74,20 +98,28 @@ def VehicleList(request):
 
 @admin_required
 def CreateModel(request):
-    """Form to add a new car/bike model (require input for all table columns)."""
+    """Form to add a new car/bike model using Stored Procedure."""
     categories = BikeCategory.objects.all()
     
     if request.method == 'POST':
         try:
-            Bike.objects.create(
-                license_plate=request.POST.get('license_plate'),
-                model_name=request.POST.get('model_name'),
-                category_id=request.POST.get('category_id'),
-                engine_size=request.POST.get('engine_size'),
-                image_url=request.POST.get('image_url'),
-                description=request.POST.get('description'),
-                status=request.POST.get('status', 'Available')
-            )
+            # Use Stored Procedure: AdminAddBike
+            # AdminAddBike(p_model_name, p_license_plate, p_category_name, p_description, p_engine_size, p_image_url)
+            
+            # Need category NAME, not ID for the procedure as currently written in SQL dump
+            category_id = request.POST.get('category_id')
+            category = BikeCategory.objects.get(pk=category_id)
+            
+            with connection.cursor() as cursor:
+                cursor.execute("CALL AdminAddBike(%s, %s, %s, %s, %s, %s)", [
+                    request.POST.get('model_name'),
+                    request.POST.get('license_plate'),
+                    category.name,
+                    request.POST.get('description'),
+                    request.POST.get('engine_size'),
+                    request.POST.get('image_url')
+                ])
+            
             return redirect('admin_vehicles')
         except Exception as e:
             return render(request, 'myshop_template/admin/vehicle_form.html', {
@@ -103,23 +135,24 @@ def CreateModel(request):
 
 @admin_required
 def AddInventory(request):
-    """Form to add a vehicle to an existing model (inherit other data)."""
+    """Form to add a vehicle to an existing model using Stored Procedure."""
     if request.method == 'POST':
         source_bike_id = request.POST.get('source_bike_id')
         new_license_plate = request.POST.get('license_plate')
         
         try:
+            # Get the model name from the source bike
             source_bike = Bike.objects.get(pk=source_bike_id)
             
-            Bike.objects.create(
-                license_plate=new_license_plate,
-                model_name=source_bike.model_name,
-                category=source_bike.category,
-                engine_size=source_bike.engine_size,
-                image_url=source_bike.image_url,
-                description=source_bike.description,
-                status='Available' # Default to available for new inventory
-            )
+            # Use Stored Procedure: AdminAddBikeFromExisting
+            # AdminAddBikeFromExisting(p_model_name, p_new_license_plate)
+            
+            with connection.cursor() as cursor:
+                cursor.execute("CALL AdminAddBikeFromExisting(%s, %s)", [
+                    source_bike.model_name,
+                    new_license_plate
+                ])
+                
             return redirect('admin_vehicles')
         except Exception as e:
              # In case of error, re-render with context
@@ -130,10 +163,6 @@ def AddInventory(request):
             })
 
     # Get unique models/bikes to copy from
-    # Group by model_name to show unique "models" to pick from
-    # For simplicity, let's just list all bikes and user picks one as "template"
-    # Or better, distinct model names? But `engine_size` etc might vary.
-    # Let's list all bikes as potential templates, but display them nicely.
     bikes = Bike.objects.all().order_by('model_name')
     return render(request, 'myshop_template/admin/add_inventory.html', {'bikes': bikes})
 
@@ -144,14 +173,31 @@ def EditVehicle(request, bike_id):
     
     if request.method == 'POST':
         try:
-            bike.license_plate = request.POST.get('license_plate')
-            bike.model_name = request.POST.get('model_name')
-            bike.category_id = request.POST.get('category_id')
-            bike.engine_size = request.POST.get('engine_size')
-            bike.image_url = request.POST.get('image_url')
-            bike.description = request.POST.get('description')
-            bike.status = request.POST.get('status')
-            bike.save()
+            # Use Stored Procedure: AdminUpdateBikeInfo
+            # AdminUpdateBikeInfo(p_bike_id, p_new_model, p_new_plate, p_new_category_name, p_new_description, p_new_engine_size, p_new_image_url)
+            
+            category_id = request.POST.get('category_id')
+            category = BikeCategory.objects.get(pk=category_id)
+            
+            with connection.cursor() as cursor:
+                cursor.execute("CALL AdminUpdateBikeInfo(%s, %s, %s, %s, %s, %s, %s)", [
+                    bike_id,
+                    request.POST.get('model_name'),
+                    request.POST.get('license_plate'),
+                    category.name,
+                    request.POST.get('description'),
+                    request.POST.get('engine_size'),
+                    request.POST.get('image_url')
+                ])
+                
+            # Handle status change separately
+            new_status = request.POST.get('status')
+            # Only update status if it's provided and different
+            # Note: If status is 'Rented', the form might not send it (disabled select), so we skip
+            if new_status and new_status != bike.status:
+                 with connection.cursor() as cursor:
+                    cursor.execute("CALL AdminUpdateBikeStatus(%s, %s)", [bike_id, new_status])
+
             return redirect('admin_vehicles')
         except Exception as e:
             return render(request, 'myshop_template/admin/vehicle_form.html', {
@@ -171,8 +217,18 @@ def EditVehicle(request, bike_id):
 def DeleteVehicle(request, bike_id):
     bike = get_object_or_404(Bike, pk=bike_id)
     if request.method == 'POST':
-        bike.delete()
-        return redirect('admin_vehicles')
+        try:
+            # Use Stored Procedure: AdminDeleteBike
+            # AdminDeleteBike(p_bike_id)
+            with connection.cursor() as cursor:
+                cursor.execute("CALL AdminDeleteBike(%s)", [bike_id])
+            return redirect('admin_vehicles')
+        except Exception as e:
+             # If delete fails (e.g. trigger prevents deleting rented bike), show error
+             # We might need a way to pass error to the list view or render an error page
+             # For now, let's render the confirm page again with error
+             return render(request, 'myshop_template/admin/confirm_delete.html', {'item': bike, 'error': str(e)})
+             
     return render(request, 'myshop_template/admin/confirm_delete.html', {'item': bike})
 
 # --- Status Logic ---
@@ -180,32 +236,17 @@ def DeleteVehicle(request, bike_id):
 @admin_required
 def UpdateStatus(request, bike_id):
     if request.method == 'POST':
-        bike = get_object_or_404(Bike, pk=bike_id)
         new_status = request.POST.get('status')
-        old_status = bike.status
         
-        bike.status = new_status
-        bike.save()
-        
-        # Trigger: On status change (Rented -> Available), record actual_return_date
-        if old_status == 'Rented' and new_status == 'Available':
-            # Find the active rental for this bike
-            # Assuming the latest active rental is the one to close
-            active_rental = Rental.objects.filter(
-                bike=bike, 
-                payment_status='Active',
-                actual_return_date__isnull=True
-            ).order_by('-start_date').first()
+        try:
+            # Just a normal status update (e.g. Available -> Fix)
+            # Use Stored Procedure: AdminUpdateBikeStatus
+            # AdminUpdateBikeStatus(p_bike_id, p_new_status)
+            with connection.cursor() as cursor:
+                cursor.execute("CALL AdminUpdateBikeStatus(%s, %s)", [bike_id, new_status])
             
-            if active_rental:
-                active_rental.actual_return_date = timezone.now()
-                active_rental.payment_status = 'Done' # Or Keep active until paid? Prompt implies just recording date.
-                # Let's assume 'Done' or just date update. The prompt says "record actual_return_date".
-                # Often "Active" implies currently rented. If returned, it might be "Done" or "Pending Payment".
-                # I'll mark as Done for now to close the loop.
-                active_rental.payment_status = 'Done'
-                active_rental.save()
-        
-        return JsonResponse({'success': True})
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+            
     return JsonResponse({'success': False}, status=400)
-

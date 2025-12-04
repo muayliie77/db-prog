@@ -41,11 +41,18 @@
                 </div>
                 <div class="col-md-6">
                     <label for="status" class="form-label">Status</label>
-                    <select class="form-select" id="status" name="status">
-                        <option value="Available" {% if bike.status == 'Available' %}selected{% endif %}>Available</option>
-                        <option value="Rented" {% if bike.status == 'Rented' %}selected{% endif %}>Rented</option>
-                        <option value="Fix" {% if bike.status == 'Fix' %}selected{% endif %}>Fix</option>
-                    </select>
+                    {% if bike.status == 'Rented' %}
+                        <input type="text" class="form-control" value="Rented" disabled>
+                        <input type="hidden" name="status" value="Rented">
+                        <div class="form-text text-warning">
+                            <i class="fas fa-exclamation-circle"></i> Vehicle is currently rented. Complete the return in the <a href="{% url 'admin_bookings' %}">Bookings</a> page to make it available.
+                        </div>
+                    {% else %}
+                        <select class="form-select" id="status" name="status">
+                            <option value="Available" {% if bike.status == 'Available' %}selected{% endif %}>Available</option>
+                            <option value="Fix" {% if bike.status == 'Fix' %}selected{% endif %}>Fix</option>
+                        </select>
+                    {% endif %}
                 </div>
             </div>
 
@@ -65,4 +72,3 @@
     </div>
 </div>
 {% endblock %}
-

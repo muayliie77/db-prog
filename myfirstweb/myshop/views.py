@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from .models import Bike, Rental, Customer, BikeCategory
 from datetime import datetime
+from django.db import connection
 
 # def Home (request) :
 # return HttpResponse('<h1 > Hello Django : MyShop </h1>')
@@ -156,48 +157,81 @@ def Checkout(request):
     total_price = rental_price + deposit_amount
 
     if request.method == "POST":
-        # Save everything to DB
+        # Save everything to DB using Stored Procedures
+        try:
+            with connection.cursor() as cursor:
+                # 1. Save Customer using SP
+                # MySQL Procedure: SaveCustomerForBooking(..., OUT p_customer_id_out)
+                # In Django/MySQL wrapper, we can't easily get OUT params from callproc directly in one go cleanly with some drivers.
+                # We'll use raw SQL to be safe and precise.
+                
+                cursor.execute("""
+                    SET @customer_id = 0;
+                    CALL SaveCustomerForBooking(%s, %s, %s, %s, %s, %s, @customer_id);
+                    SELECT @customer_id;
+                """, [
+                    customer_data["citizen_id"],
+                    customer_data["first_name"],
+                    customer_data["last_name"],
+                    customer_data["phone"],
+                    rental_data["email"],
+                    customer_data["line_id"]
+                ])
+                
+                # The result of the SELECT @customer_id will be in the last result set
+                # fetchall() might return results from CALL first (empty) then SELECT.
+                # But typically with Django's MySQL wrapper, we might need to iterate.
+                # Let's try a simpler approach if the above is complex with Django wrapper:
+                # execute the CALL, then execute SELECT.
+                
+                # Ideally:
+                # cursor.execute("CALL SaveCustomerForBooking(%s, %s, %s, %s, %s, %s, @customer_id)", [...])
+                # cursor.execute("SELECT @customer_id")
+                # row = cursor.fetchone()
+                # customer_id = row[0]
+                
+                # Let's do it step by step to be safe with Django's wrapper behavior
+                cursor.execute("CALL SaveCustomerForBooking(%s, %s, %s, %s, %s, %s, @customer_id)", [
+                    customer_data["citizen_id"],
+                    customer_data["first_name"],
+                    customer_data["last_name"],
+                    customer_data["phone"],
+                    rental_data["email"],
+                    customer_data["line_id"]
+                ])
+                
+                cursor.execute("SELECT @customer_id")
+                row = cursor.fetchone()
+                if not row:
+                    raise Exception("Failed to get customer ID from stored procedure")
+                customer_id = row[0]
 
-        # 1. Create or Get Customer
-        customer, created = Customer.objects.get_or_create(
-            citizen_id=customer_data["citizen_id"],
-            defaults={
-                "first_name": customer_data["first_name"],
-                "last_name": customer_data["last_name"],
-                "phone": customer_data["phone"],
-                "email": rental_data["email"],
-                "line_id": customer_data["line_id"],
-            },
-        )
-        # Update email if customer already exists
-        if not created:
-            customer.email = rental_data["email"]
-            customer.first_name = customer_data["first_name"]
-            customer.last_name = customer_data["last_name"]
-            customer.phone = customer_data["phone"]
-            customer.line_id = customer_data["line_id"]
-            customer.save()
+                # 2. Create Rental using SP
+                # CreateRental(p_customer_id, p_bike_id, p_start_date, p_end_date)
+                # Triggers will handle validation and price calculation.
+                
+                start_str = f"{rental_data['pickup_date']} {rental_data['pickup_time']}"
+                end_str = f"{rental_data['return_date']} {rental_data['return_time']}"
+                
+                cursor.execute("CALL CreateRental(%s, %s, %s, %s)", [
+                    customer_id,
+                    bike_id,
+                    start_str,
+                    end_str
+                ])
+                
+                # Clear session
+                request.session.flush()
 
-        # 2. Create Rental
-        # Combine date and time
-        start_str = f"{rental_data['pickup_date']} {rental_data['pickup_time']}"
-        end_str = f"{rental_data['return_date']} {rental_data['return_time']}"
+                return JsonResponse(
+                    {"success": True, "message": "Booking Confirmed, Thank you!"}
+                )
 
-        Rental.objects.create(
-            start_date=start_str,
-            end_date=end_str,
-            total_price=total_price,  # Rental price + deposit
-            customer=customer,
-            bike=bike,
-            payment_status="Active",
-        )
-
-        # Clear session
-        request.session.flush()
-
-        return JsonResponse(
-            {"success": True, "message": "Booking Confirmed, Thank you!"}
-        )
+        except Exception as e:
+            # If Trigger fails (e.g., double booking), it raises an error.
+            return JsonResponse(
+                {"success": False, "message": f"Booking Failed: {str(e)}"}
+            )
 
     return render(
         request,

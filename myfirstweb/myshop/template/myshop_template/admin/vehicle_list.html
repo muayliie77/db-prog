@@ -32,11 +32,15 @@
                 <td>{{ bike.model_name }}</td>
                 <td>{{ bike.category.name }}</td>
                 <td>
-                    <select class="form-select form-select-sm status-select" data-bike-id="{{ bike.bike_id }}" style="width: auto; display: inline-block;">
-                        <option value="Available" {% if bike.status == 'Available' %}selected{% endif %}>Available</option>
-                        <option value="Rented" {% if bike.status == 'Rented' %}selected{% endif %}>Rented</option>
-                        <option value="Fix" {% if bike.status == 'Fix' %}selected{% endif %}>Fix</option>
-                    </select>
+                    {% if bike.status == 'Available' %}
+                        <span class="badge bg-success">Available</span>
+                    {% elif bike.status == 'Rented' %}
+                        <span class="badge bg-warning text-dark">Rented</span>
+                    {% elif bike.status == 'Fix' %}
+                        <span class="badge bg-danger">Fix</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ bike.status }}</span>
+                    {% endif %}
                 </td>
                 <td>{{ bike.engine_size }}</td>
                 <td>
@@ -53,33 +57,3 @@
     </table>
 </div>
 {% endblock %}
-
-{% block scripts %}
-<script>
-document.querySelectorAll('.status-select').forEach(select => {
-    select.addEventListener('change', function() {
-        const bikeId = this.dataset.bikeId;
-        const newStatus = this.value;
-        
-        fetch(`/admin/vehicle/${bikeId}/status/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: `status=${newStatus}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Optional: show toast notification
-                console.log('Status updated');
-            } else {
-                alert('Failed to update status');
-            }
-        });
-    });
-});
-</script>
-{% endblock %}
-

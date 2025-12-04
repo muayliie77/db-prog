@@ -7,6 +7,7 @@ urlpatterns = [
     path('dashboard/', admin_views.AdminDashboard, name='admin_dashboard'),
     path('customers/', admin_views.CustomerList, name='admin_customers'),
     path('bookings/', admin_views.BookingList, name='admin_bookings'),
+    path('bookings/<int:rental_id>/complete/', admin_views.CompleteBooking, name='admin_complete_booking'),
     path('vehicles/', admin_views.VehicleList, name='admin_vehicles'),
     path('vehicles/create/', admin_views.CreateModel, name='admin_create_model'),
     path('vehicles/add-inventory/', admin_views.AddInventory, name='admin_add_inventory'),
@@ -14,4 +15,3 @@ urlpatterns = [
     path('vehicles/<int:bike_id>/delete/', admin_views.DeleteVehicle, name='admin_delete_vehicle'),
     path('vehicle/<int:bike_id>/status/', admin_views.UpdateStatus, name='admin_update_status'),
 ]
-
