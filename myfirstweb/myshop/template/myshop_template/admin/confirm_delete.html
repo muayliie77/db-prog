@@ -12,13 +12,40 @@
                 Are you sure?
             </div>
             <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    <strong>Error:</strong> {{ error }}
+                </div>
+                {% endif %}
+                
+                {% if has_rentals %}
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning:</strong> This bike has rental history. Bikes with rental records cannot be deleted to maintain data integrity.
+                </div>
+                {% endif %}
+                
                 <h5 class="card-title">Deleting: {{ item.model_name }} ({{ item.license_plate }})</h5>
+                <p class="card-text">
+                    <strong>Status:</strong> 
+                    {% if item.status == 'Available' %}
+                        <span class="badge bg-success">Available</span>
+                    {% elif item.status == 'Rented' %}
+                        <span class="badge bg-warning text-dark">Rented</span>
+                    {% elif item.status == 'Fix' %}
+                        <span class="badge bg-danger">Fix</span>
+                    {% endif %}
+                </p>
                 <p class="card-text">This action cannot be undone.</p>
+                
+                {% if not error and not has_rentals and item.status != 'Rented' %}
                 <form method="post">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Yes, Delete</button>
                     <a href="{% url 'admin_vehicles' %}" class="btn btn-secondary">Cancel</a>
                 </form>
+                {% else %}
+                <a href="{% url 'admin_vehicles' %}" class="btn btn-secondary">Back to Vehicles</a>
+                {% endif %}
             </div>
         </div>
     </div>

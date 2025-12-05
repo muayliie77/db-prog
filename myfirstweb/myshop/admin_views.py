@@ -216,7 +216,24 @@ def EditVehicle(request, bike_id):
 @admin_required
 def DeleteVehicle(request, bike_id):
     bike = get_object_or_404(Bike, pk=bike_id)
+    
+    # Check for existing rentals before attempting deletion
+    has_rentals = Rental.objects.filter(bike_id=bike_id).exists()
+    
     if request.method == 'POST':
+        # Double-check status and rentals before deletion
+        if bike.status == 'Rented':
+            return render(request, 'myshop_template/admin/confirm_delete.html', {
+                'item': bike, 
+                'error': 'Cannot delete bike: Bike is currently rented. Please return the bike first.'
+            })
+        
+        if has_rentals:
+            return render(request, 'myshop_template/admin/confirm_delete.html', {
+                'item': bike, 
+                'error': 'Cannot delete bike: This bike has rental history. Bikes with rental records cannot be deleted to maintain data integrity.'
+            })
+        
         try:
             # Use Stored Procedure: AdminDeleteBike
             # AdminDeleteBike(p_bike_id)
@@ -225,11 +242,19 @@ def DeleteVehicle(request, bike_id):
             return redirect('admin_vehicles')
         except Exception as e:
              # If delete fails (e.g. trigger prevents deleting rented bike), show error
-             # We might need a way to pass error to the list view or render an error page
-             # For now, let's render the confirm page again with error
-             return render(request, 'myshop_template/admin/confirm_delete.html', {'item': bike, 'error': str(e)})
+             error_msg = str(e)
+             # Check if it's a foreign key constraint error
+             if 'foreign key' in error_msg.lower() or 'cannot delete' in error_msg.lower() or 'rental' in error_msg.lower():
+                 error_msg = 'Cannot delete bike: This bike has rental history. Bikes with rental records cannot be deleted to maintain data integrity.'
+             return render(request, 'myshop_template/admin/confirm_delete.html', {
+                 'item': bike, 
+                 'error': error_msg
+             })
              
-    return render(request, 'myshop_template/admin/confirm_delete.html', {'item': bike})
+    return render(request, 'myshop_template/admin/confirm_delete.html', {
+        'item': bike,
+        'has_rentals': has_rentals
+    })
 
 # --- Status Logic ---
 
